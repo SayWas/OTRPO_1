@@ -4,32 +4,44 @@
     <button @click="searchPokemon" class="button button-search">Search</button>
   </div>
   <div class="pokemon-view">
-    <span>{{ pokemonInfo }}</span>
+    <span v-for="pokemon in pokemons">{{ pokemon.name }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {PokemonAPI} from "@/api/pokemon-api";
 
 const prompt = ref<string>("")
-const pokemonInfo = ref<string>("");
+const pokemons = ref<any[]>([{name: "Не найдено"}])
 
 const searchPokemon = async () => {
   if (prompt.value === "") {
-    pokemonInfo.value = "Не найдено";
+    PokemonAPI.getAllPokemons().then(
+        (response) => {
+          pokemons.value = response;
+        }
+    )
     return;
   }
   await PokemonAPI.getPokemon(prompt.value).then(
     (response) => {
-      pokemonInfo.value = response;
+      pokemons.value = response;
     }
   ).catch(
     () => {
-      pokemonInfo.value = "Не найдено";
+      pokemons.value = [{name: "Не найдено"}];
     }
   )
 }
+
+onMounted(() => {
+  PokemonAPI.getAllPokemons().then(
+    (response) => {
+      pokemons.value = response;
+    }
+  )
+})
 </script>
 
 <style scoped lang="scss">
@@ -84,6 +96,7 @@ const searchPokemon = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100%;
   color: #181818;
 }
