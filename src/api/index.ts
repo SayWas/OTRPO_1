@@ -11,7 +11,7 @@ const loginConfig = {
 export const LoginAPIInstance = axios.create(loginConfig)
 
 const defaultConfig = {
-    baseURL: 'https://pokeapi.co/api/v2/',
+    baseURL: 'http://localhost:8000/',
     headers:{
         'Content-Type': 'application/json'
     }

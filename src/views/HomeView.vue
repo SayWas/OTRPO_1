@@ -1,58 +1,54 @@
 <template>
-  <div class="search_bar">
-    <input class="search_input" type="text" placeholder="Search" v-model="prompt"/>
+  <div class="search-bar">
+    <input class="search-input" type="text" placeholder="Search" v-model="prompt"/>
     <button @click="searchPokemon" class="button button-search">Search</button>
   </div>
   <div class="pokemon-view">
-    <span v-for="pokemon in pokemons">{{ pokemon.name }}</span>
+    <PokemonListItem v-for="pokemon in pokemonStore.pokemons[pokemonStore.page]" :key="pokemon.name" :pokemon="pokemon"/>
+<!--    <span v-for="pokemon in pokemonStore.pokemons[pokemonStore.page]">{{ pokemon.name }}</span>-->
+    <span v-if="pokemonStore.pokemons[pokemonStore.page] === undefined">Покемон не найден</span>
+  </div>
+  <div class="pagination">
+    <button
+        v-for="page in pokemonStore.pages"
+        @click="pokemonStore.page = page"
+        :class="{'button': true, 'active': pokemonStore.page === page}"
+        >
+      {{ page }}
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {PokemonAPI} from "@/api/pokemon-api";
+import {usePokemonStore} from "@/stores/pokemon";
+import PokemonListItem from "@/components/PokemonListItem.vue";
 
 const prompt = ref<string>("")
-const pokemons = ref<any[]>([{name: "Не найдено"}])
+const pokemonStore = usePokemonStore();
 
 const searchPokemon = async () => {
   if (prompt.value === "") {
-    PokemonAPI.getAllPokemons().then(
-        (response) => {
-          pokemons.value = response;
-        }
-    )
-    return;
+    await pokemonStore.getAllPokemons();
+  } else {
+    await pokemonStore.searchPokemon(prompt.value);
   }
-  await PokemonAPI.getPokemon(prompt.value).then(
-    (response) => {
-      pokemons.value = response;
-    }
-  ).catch(
-    () => {
-      pokemons.value = [{name: "Не найдено"}];
-    }
-  )
 }
 
 onMounted(() => {
-  PokemonAPI.getAllPokemons().then(
-    (response) => {
-      pokemons.value = response;
-    }
-  )
+  pokemonStore.getAllPokemons();
 })
 </script>
 
 <style scoped lang="scss">
-.search_bar {
+.search-bar {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
   margin-bottom: 20px;
 
-  .search_input {
+  .search-input {
     width: 50%;
     height: 40px;
     border-radius: 40px;
@@ -69,6 +65,7 @@ onMounted(() => {
       border: 1px solid #333;
     }
   }
+
   .button {
     width: 100px;
     height: 40px;
@@ -88,16 +85,56 @@ onMounted(() => {
       border: 1px solid #333;
     }
   }
+
   .button-search {
     margin-left: 10px;
   }
 }
+
 .pokemon-view {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 100px;
+  color: #181818;
+}
+
+.pagination{
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  height: 100%;
-  color: #181818;
+  margin-top: 20px;
+  margin-bottom: 50px;
+
+  .button {
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    outline: none;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #333;
+    }
+  }
+
+  .active {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #333;
+  }
+
+  .button+button {
+    margin-left: 10px;
+  }
 }
 </style>
