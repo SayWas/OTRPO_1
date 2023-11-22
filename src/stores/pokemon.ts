@@ -8,35 +8,43 @@ export const usePokemonStore = defineStore('pokemon', () => {
   const page = ref(0)
   const pages = ref(0)
   const pokemons: Ref<pokemonsSchema> = ref({})
+  const isPokemonLoading = ref(false)
 
-  watch(page, async () => {
-    if (page.value === 0) return
+  watch([page, isPokemonLoading], async () => {
+    if (page.value === 0 || !isPokemonLoading.value) return;
     for (const pokemon of pokemons.value[page.value]) {
-      if (!pokemon.sprites) {
+      if (!pokemon.sprites && isPokemonLoading.value) {
         await PokemonAPI.getPokemon(pokemon.name).then((result) => {
-          pokemons.value[page.value].splice(pokemons.value[page.value].indexOf(pokemon), 1, result)
+          if (isPokemonLoading.value) {
+            pokemons.value[page.value].splice(pokemons.value[page.value].indexOf(pokemon), 1, result)
+          }
         })
       }
     }
   })
 
   const getAllPokemons = async (): Promise<void> => {
-    page.value = 0
-    const results = await PokemonAPI.getAllPokemons()
-    pages.value = Math.ceil(results.count / 49)
-    page.value = 1
-    for (let i = 1; i <= pages.value; i++) {
-      pokemons.value[i] = results.results.slice((i - 1) * 49, i * 49)
+    // if (pokemons.value[1]) return
+    try {
+      page.value = 0
+      const results = await PokemonAPI.getAllPokemons()
+      pages.value = Math.ceil(results.count / 49)
+      page.value = 1
+      for (let i = 1; i <= pages.value; i++) {
+        pokemons.value[i] = results.results.slice((i - 1) * 49, i * 49)
+      }
+    } catch (error) {
+      console.error("Error fetching pokemons:", error);
     }
   }
 
   const getPokemon = async (name: string): Promise<pokemonSchema | undefined> => {
     try {
-      const pokemon = await PokemonAPI.getPokemon(name)
-      return pokemon
+      const pokemon = await PokemonAPI.getPokemon(name);
+      return pokemon;
     } catch (error) {
-      console.error(error)
-      return undefined
+      console.error("Error fetching pokemon:", error);
+      return undefined;
     }
   }
 
@@ -66,7 +74,7 @@ export const usePokemonStore = defineStore('pokemon', () => {
       })
   }
 
-  return { page, pages, pokemons, getAllPokemons, getPokemon, searchPokemon, savePokemon }
+  return { page, pages, pokemons, getAllPokemons, getPokemon, searchPokemon, savePokemon, isPokemonLoading }
 })
 
 interface pokemonsSchema {

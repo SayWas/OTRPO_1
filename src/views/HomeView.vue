@@ -5,7 +5,6 @@
   </div>
   <div class="pokemon-view">
     <PokemonListItem v-for="pokemon in pokemonStore.pokemons[pokemonStore.page]" :key="pokemon.name" :pokemon="pokemon"/>
-<!--    <span v-for="pokemon in pokemonStore.pokemons[pokemonStore.page]">{{ pokemon.name }}</span>-->
     <span v-if="pokemonStore.pokemons[pokemonStore.page] === undefined">Покемон не найден</span>
   </div>
   <div class="pagination">
@@ -13,6 +12,7 @@
         v-for="page in pokemonStore.pages"
         @click="pokemonStore.page = page"
         :class="{'button': true, 'active': pokemonStore.page === page}"
+        :key="page"
         >
       {{ page }}
     </button>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {usePokemonStore} from "@/stores/pokemon";
 import PokemonListItem from "@/components/PokemonListItem.vue";
 
@@ -36,7 +36,11 @@ const searchPokemon = async () => {
 }
 
 onMounted(() => {
+  pokemonStore.isPokemonLoading = true;
   pokemonStore.getAllPokemons();
+})
+onUnmounted(() => {
+  pokemonStore.isPokemonLoading = false;
 })
 </script>
 
