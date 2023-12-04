@@ -33,7 +33,7 @@
         Auto fight!
       </button>
     </div>
-    <div class="ftp-form">
+    <div v-if="userStore.currentUser?.role.permissions?.CAN_USE_FTP" class="ftp-form">
       <input 
         type="text" 
         v-model="ftpLogin" 
@@ -54,6 +54,7 @@ import {ref, onMounted} from "vue";
 import {useRoute} from "vue-router";
 import {useFightStore} from "@/stores/fight";
 import router from "@/router";
+import {useUserStore} from "@/stores/user";
 
 const route = useRoute();
 const pokemonStore = usePokemonStore();
@@ -95,6 +96,8 @@ const autoFight = () => {
   fightStore.selectOpponent(pokemon.value);
   router.push('/fight?auto=true');
 }
+
+const userStore = useUserStore();
 
 const ftpLogin = ref('');
 const ftpPassword = ref('');

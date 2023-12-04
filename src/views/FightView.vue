@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import {useFightStore} from "@/stores/fight";
-import {onMounted, ref} from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 
 const fightStore = useFightStore();
@@ -83,6 +83,10 @@ onMounted(() => {
   if (route.query.auto === "true") {
     autoFight();
   }
+})
+
+onBeforeUnmount(() => {
+  fightStore.reset_fight()
 })
 </script>
 

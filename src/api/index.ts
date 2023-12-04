@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const loginConfig = {
-    baseURL: 'https://pokeapi.co/api/v2/',
+    baseURL: 'http://localhost:8000/',
     headers: {
         'Content-Type': 'multipart/form-data'
     },
@@ -14,13 +14,14 @@ const defaultConfig = {
     baseURL: 'http://localhost:8000/',
     headers:{
         'Content-Type': 'application/json'
-    }
+    },
+    withCredentials: true
 }
 
 export const DefaultAPIInstance = axios.create(defaultConfig)
 
 // DefaultAPIInstance.interceptors.response.use((response) => response, (error) => {
 //     if (error.response.status === 401) {
-//         router.replace({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } }).then(r => {})
+//         router.replace({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } }).then(() => {})
 //     }
 // });

@@ -1,11 +1,16 @@
 <template>
   <body>
-    <RouterView/>
+  <PokeHeader/>
+  <RouterView/>
   </body>
 </template>
 
 <script setup lang="ts">
 import {RouterView} from 'vue-router'
+import PokeHeader from "@/components/PokeHeader.vue";
+import {useUserStore} from "@/stores/user";
+
+const userStore = useUserStore();
 </script>
 
 <style scoped>

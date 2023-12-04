@@ -70,17 +70,21 @@ export const PokemonAPI = {
     },
 
     async addToDataBase(
-        text: string
+        winner_id: string,
+        loser_id: string,
+        total_rounds: number
     ): Promise<string>
     {
         const url: string = '/add_to_db'
         let response: string | undefined
         let errorMessage: string = ''
 
-        console.log(text)
-        await DefaultAPIInstance.post(url, null,{ params: {
-                text: text
-            }})
+        const data = {
+            'winner_id': winner_id,
+            'loser_id': loser_id,
+            'total_rounds': total_rounds
+        }
+        await DefaultAPIInstance.post(url, data)
             .then(async (r): Promise<void> => {
                 if (r.status === 201) {
                     console.log(r)
@@ -153,7 +157,8 @@ interface pokemonSchema {
         ability: {
             name: string
         }
-    }[]
+    }[],
+    id: number
 }
 
 export type {pokemonSchema, pokemonResponseSchema};
